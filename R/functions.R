@@ -34,7 +34,7 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
       drop_na((!!sym(y))) %>%
       group_by(Time, (!!sym(group))) %>%
       summarise(mean = mean((!!sym(y))),
-                se = sd((!!sym(y))) / n()) %>%
+                se = sd((!!sym(y))) / sqrt(n())) %>%
       ggplot(aes(x = Time, y = mean - 1, group = (!!sym(group)), fill = (!!sym(group)))) +
       geom_bar(stat = "identity", position = position_dodge(0.6), width = 0.5) +
       geom_errorbar(aes(ymin = mean - se - 1, ymax = mean + se - 1), width = 0, 
