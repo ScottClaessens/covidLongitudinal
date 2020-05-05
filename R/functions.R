@@ -12,6 +12,26 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
   d$ChildrenDichot <- factor(ifelse(d$ChildrenDichot==0, "None", "At least one"))
   # prepare sex
   d$Sex <- factor(ifelse(d$Sex==1, "Male", "Female"))
+  # if humanity vs. neighborhood plots
+  if (group == "Grouping") {
+    d <-
+      d %>%
+      select(Time, NBTHumanity, PFIHumanityEmpathy, PFIHumanitySharedFate, WillingnessHumanity,
+             NBTNeigh, PFINeighEmpathy, PFINeighSharedFate, WillingnessNeigh) %>%
+      rename(
+        NBT_Humanity               = NBTHumanity,
+        NBT_Neighborhood           = NBTNeigh,
+        PFIEmpathy_Humanity        = PFIHumanityEmpathy,
+        PFIEmpathy_Neighborhood    = PFINeighEmpathy,
+        PFISharedFate_Humanity     = PFIHumanitySharedFate,
+        PFISharedFate_Neighborhood = PFINeighSharedFate,
+        Willingness_Humanity       = WillingnessHumanity,
+        Willingness_Neighborhood   = WillingnessNeigh
+        ) %>%
+      pivot_longer(cols = -Time,
+                   names_to = c(".value", "Grouping"), 
+                   names_sep = "_")
+  }
   # make plots
   if (type == "line") {
     out <-
@@ -24,7 +44,7 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
       geom_line(position = position_dodge(0.1)) +
       geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0, 
                     position = position_dodge(0.1)) +
-      geom_point(position = position_dodge(0.1)) +
+      geom_point(position = position_dodge(0.1), size = 0.8) +
       scale_y_continuous(breaks = ymin:ymax, limits = c(ymin, ymax)) +
       guides(colour=guide_legend(title=legendTitle))
   }
@@ -92,13 +112,22 @@ makePlotList <- function(d, plotPars, type) {
 
 makeGrid <- function(plotList, indexes, file, height = 7, width = 9) {
   l <- get_legend(plotList[[indexes[1]]])
-  out <- plot_grid(plotList[[indexes[1]]] + theme(legend.position = "none"),
-                   plotList[[indexes[2]]] + theme(legend.position = "none"),
-                   plotList[[indexes[3]]] + theme(legend.position = "none"),
-                   plotList[[indexes[4]]] + theme(legend.position = "none"),
-                   nrow = 2, labels = letters[1:4])
+  if (grepl("grouping", file)) {
+    out <- plot_grid(plotList[[indexes[1]]] + theme(legend.position = "none"),
+                     plotList[[indexes[2]]] + theme(legend.position = "none"),
+                     nrow = 1, labels = letters[1:2])
+  } else {
+    out <- plot_grid(plotList[[indexes[1]]] + theme(legend.position = "none"),
+                     plotList[[indexes[2]]] + theme(legend.position = "none"),
+                     plotList[[indexes[3]]] + theme(legend.position = "none"),
+                     plotList[[indexes[4]]] + theme(legend.position = "none"),
+                     nrow = 2, labels = letters[1:4])
+  }
   out <- plot_grid(out, l, rel_widths = c(1, 0.2))
-  ggsave(file, plot = out, height = height, width = width)
+  ggsave(file, 
+         plot = out, 
+         height = ifelse(grepl("grouping", file), height / 2, height), 
+         width = width)
   return(out)
 }
 
@@ -108,11 +137,15 @@ makeGridList <- function(plotList, type) {
   gridTypes <- c("risk", "pfi", "help")
   files <- paste0("figures/", type, "Plots/", rep(groups, each=3), "/grids/", 
                   type, "_", rep(groups, each=3), "_", rep(gridTypes, times=4), "Grid.pdf")
+  files <- c(files, 
+             paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_pfiGrid.pdf"),
+             paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_helpGrid.pdf"))
   # indexes
   i <- list(c(10:13), c( 1:4 ), c( 5:8 ), # region
             c(23:26), c(14:17), c(18:21), # sex
             c(36:39), c(27:30), c(31:34), # children
-            c(49:52), c(40:43), c(44:47)) # ses
+            c(49:52), c(40:43), c(44:47), # ses
+            c(53:54), c(55:56))           # grouping
   # list
   out <- list()
   for (j in 1:length(files)) {

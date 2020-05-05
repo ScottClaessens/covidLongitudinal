@@ -51,3 +51,7 @@ RiskReduction,SSES,Risk Management (Reduction),"I try to reduce my risk of getti
 RiskRetention,SSES,Risk Management (Retention),"I have been stocking up on food and supplies\nso that I am prepared for the COVID19 epidemic","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)",SES,1,7,ses,riskManageRetention.pdf
 RiskTransfer,SSES,Risk Management (Transfer),"I am likely to ask parents or friends for help\npreparing for the COVID19 epidemic","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)",SES,1,7,ses,riskManageTransfer.pdf
 RiskAvoidance,SSES,Risk Management (Avoidance),"I completely avoid situations that could put\nme at risk of contracting COVID19","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)",SES,1,7,ses,riskManageAvoidance.pdf
+PFIEmpathy,Grouping,PFI Empathy,"When _______ succeeds, I feel good","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)",Grouping,1,7,grouping,pfiEmpathy.pdf
+PFISharedFate,Grouping,PFI Shared Fate,"_______ and I rise and fall together","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)",Grouping,1,7,grouping,pfiSharedFate.pdf
+Willingness,Grouping,Willingness to help,"_______ is having their house fixed,\nso it isn't livable. How willing would you\nbe to let them move into your house for a week?","Mean +/- SE\n(1 = not at all willing, 7 = very willing)",Grouping,1,7,grouping,willingness.pdf
+NBT,Grouping,NBT,"\nHelping someone from _______ when\nthey are in need is the right thing to do","Mean +/- SE\n(1 = strongly disagree, 7 = strongly agree)",Grouping,1,7,grouping,nbt.pdf
