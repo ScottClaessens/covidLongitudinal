@@ -6,7 +6,7 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
   d$SSES <- factor(d$SSES, levels = c("High SES", "Medium SES", "Low SES"))
   # prepare IPregion
   d$IPregion <- ifelse(d$IPregion == "UK", "United Kingdom / Ireland",
-                       ifelse(d$IPregion == "Europe", "Europe (excl. UK)",
+                       ifelse(d$IPregion == "Europe", "Europe (excl. UK / Ireland)",
                               ifelse(d$IPregion == "North America", "United States / Canada", 
                                      d$IPregion)))
   d$IPregion <- factor(d$IPregion, levels = unique(d$IPregion)[c(3,2,1,4)])
@@ -15,9 +15,7 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
   # prepare sex
   d$Sex <- factor(ifelse(d$Sex==1, "Male", "Female"))
   # prepare age
-  d$Age <- factor(ifelse(d$Age < 25, "18-25",
-                         ifelse(d$Age >= 25 & d$Age < 30, "25-30",
-                                ifelse(d$Age >= 30 & d$Age < 40, "30-40", "40+"))))
+  d$Age <- factor(ifelse(d$Age < 30, "18-30", "30+"))
   # if humanity vs. neighborhood plots
   if (group == "Grouping") {
     d <-
@@ -87,19 +85,16 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
           plot.subtitle = element_text(size = 10, face = "italic"))
   # save to file
   if (type == "line") {
-    ggsave(
-      out, 
-      file = paste0("figures/linePlots/", foldername, "/individual/line_", 
-                    foldername, "_", filename), 
-      width = 6, height = 4)
+    ggsave(out, file = paste0("figures/linePlots/", foldername, "/individual/line_", 
+                              foldername, "_", filename, ".pdf"), width = 6, height = 4)
+    ggsave(out, file = paste0("figures/linePlots/", foldername, "/individual/line_", 
+                              foldername, "_", filename, ".png"), width = 6, height = 4)
   }
   if (type == "bar") {
-    ggsave(
-      out,
-      file = paste0("figures/barPlots/", foldername, "/individual/bar_", 
-                    foldername, "_", filename), 
-      width = 6,
-      height = 4)
+    ggsave(out, file = paste0("figures/barPlots/", foldername, "/individual/bar_", 
+                              foldername, "_", filename, ".pdf"), width = 6, height = 4)
+    ggsave(out, file = paste0("figures/barPlots/", foldername, "/individual/bar_", 
+                              foldername, "_", filename, ".png"), width = 6, height = 4)
   }
   return(out)
 }
@@ -137,7 +132,11 @@ makeGrid <- function(plotList, indexes, file, height = 7, width = 9.5) {
                      nrow = 2, labels = letters[1:4])
   }
   out <- plot_grid(out, l, rel_widths = c(1, 0.25))
-  ggsave(file, 
+  ggsave(paste0(file, ".pdf"), 
+         plot = out, 
+         height = ifelse(grepl("grouping", file), height / 2, height), 
+         width = width)
+  ggsave(paste0(file, ".png"), 
          plot = out, 
          height = ifelse(grepl("grouping", file), height / 2, height), 
          width = width)
@@ -149,10 +148,10 @@ makeGridList <- function(plotList, type) {
   groups <- c("region", "sex", "children", "ses")
   gridTypes <- c("risk", "pfi", "help")
   files <- paste0("figures/", type, "Plots/", rep(groups, each=3), "/grids/", 
-                  type, "_", rep(groups, each=3), "_", rep(gridTypes, times=4), "Grid.pdf")
+                  type, "_", rep(groups, each=3), "_", rep(gridTypes, times=4), "Grid")
   files <- c(files, 
-             paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_pfiGrid.pdf"),
-             paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_helpGrid.pdf"))
+             paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_pfiGrid"),
+             paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_helpGrid"))
   # indexes
   i <- list(c(10:13), c( 1:4 ), c( 5:8 ), # region
             c(23:26), c(14:17), c(18:21), # sex
@@ -187,16 +186,20 @@ makeCorPlot <- function(data, timepoint) {
       pch.col = "grey"
       )
   # save
-  ggsave(plot + ggtitle(paste0("Cohort 1, Timepoint ", timepoint)), 
+  ggsave(plot + ggtitle(paste0("Timepoint ", timepoint)), 
          file = paste0("figures/correlations/corC1T", timepoint, ".pdf"),
-         width = 7,
-         height = 7)
+         width = 7, height = 7)
+  ggsave(plot + ggtitle(paste0("Timepoint ", timepoint)), 
+         file = paste0("figures/correlations/corC1T", timepoint, ".png"),
+         width = 7, height = 7)
   return(plot)
 }
 
 countTableRegion <- function(data) {
-  data$IPregion <- ifelse(data$IPregion == "UK", "United Kingdom",
-                          ifelse(data$IPregion == "Europe", "Europe (excl. UK)", data$IPregion))
+  data$IPregion <- ifelse(data$IPregion == "UK", "United Kingdom / Ireland",
+                          ifelse(data$IPregion == "Europe", "Europe (excl. UK / Ireland)",
+                                 ifelse(data$IPregion == "North America", "United States / Canada",
+                                        data$IPregion)))
   data$IPregion <- factor(data$IPregion, levels = unique(data$IPregion)[c(3,2,1,4)])
   out <- 
     data %>%
@@ -213,12 +216,12 @@ worldMapCounts <- function(data) {
   world <- 
     ne_countries(scale = "medium", returnclass = "sf") %>%
     filter(continent %in% unique(continent)[1:6]) %>%
-    mutate(region = ifelse(iso_a2 %in% c("US", "CA"), "North America",
-                           ifelse(iso_a2 == "GB", "United Kingdom",
+    mutate(region = ifelse(iso_a2 %in% c("US", "CA"), "United States / Canada",
+                           ifelse(iso_a2 %in% c("GB", "IE"), "United Kingdom / Ireland",
                                   ifelse(continent == "Europe", 
-                                         "Europe (excl. UK)", "Other"))),
-           region = factor(region, levels = c("North America", "United Kingdom",
-                                                     "Europe (excl. UK)", "Other"))) %>%
+                                         "Europe (excl. UK / Ireland)", "Other"))),
+           region = factor(region, levels = c("United States / Canada", "United Kingdom / Ireland",
+                                                     "Europe (excl. UK / Ireland)", "Other"))) %>%
     drop_na(region)
   world <- 
     ggplot() +
@@ -229,11 +232,11 @@ worldMapCounts <- function(data) {
     data %>%
     mutate(country_code = maxmind(IPAddress, file, "country_code")$country_code,
            continent_name = maxmind(IPAddress, file, "continent_name")$continent_name,
-           region = factor(ifelse(country_code %in% c("CA", "US"), "North America",
-                                  ifelse(country_code == "GB", "United Kingdom",
+           region = factor(ifelse(country_code %in% c("CA", "US"), "United States / Canada",
+                                  ifelse(country_code %in% c("GB", "IE"), "United Kingdom / Ireland",
                                          ifelse(continent_name == "Europe", "Europe (excl. UK)",
                                                 "Other")))),
-           region = factor(region, levels = levels(region)[c(2,4,1,3)])) %>%
+           region = factor(region, levels = levels(region)[c(4,3,1,2)])) %>%
     filter(Time == 1) %>%
     group_by(region, country_code) %>%
     summarise(Count = n()) %>%
@@ -258,9 +261,9 @@ worldMapCounts <- function(data) {
     theme(axis.title.x = element_blank(),
           axis.title.y = element_blank())
   # save
-  ggsave(map, 
-         file = "figures/worldMapCounts/worldMapCounts.pdf",
-         width = 9, 
-         height = 4.5)
+  ggsave(map, file = "figures/worldMapCounts/worldMapCounts.pdf",
+         width = 9, height = 4.5)
+  ggsave(map, file = "figures/worldMapCounts/worldMapCounts.png",
+         width = 9, height = 4.5)
   return(map)
 }
