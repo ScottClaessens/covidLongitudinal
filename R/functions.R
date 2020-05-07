@@ -5,13 +5,19 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
                           ifelse(d$SSES >= 7 & d$SSES <= 9, "High SES", NA)))
   d$SSES <- factor(d$SSES, levels = c("High SES", "Medium SES", "Low SES"))
   # prepare IPregion
-  d$IPregion <- ifelse(d$IPregion == "UK", "United Kingdom",
-                       ifelse(d$IPregion == "Europe", "Europe (excl. UK)", d$IPregion))
+  d$IPregion <- ifelse(d$IPregion == "UK", "United Kingdom / Ireland",
+                       ifelse(d$IPregion == "Europe", "Europe (excl. UK)",
+                              ifelse(d$IPregion == "North America", "United States / Canada", 
+                                     d$IPregion)))
   d$IPregion <- factor(d$IPregion, levels = unique(d$IPregion)[c(3,2,1,4)])
   # prepare children
   d$ChildrenDichot <- factor(ifelse(d$ChildrenDichot==0, "None", "At least one"))
   # prepare sex
   d$Sex <- factor(ifelse(d$Sex==1, "Male", "Female"))
+  # prepare age
+  d$Age <- factor(ifelse(d$Age < 25, "18-25",
+                         ifelse(d$Age >= 25 & d$Age < 30, "25-30",
+                                ifelse(d$Age >= 30 & d$Age < 40, "30-40", "40+"))))
   # if humanity vs. neighborhood plots
   if (group == "Grouping") {
     d <-
@@ -31,6 +37,13 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
       pivot_longer(cols = -Time,
                    names_to = c(".value", "Grouping"), 
                    names_sep = "_")
+    if (grepl("PFI", y)) {
+      d$Grouping <- ifelse(d$Grouping == "Humanity", "All of humanity", "My neighborhood")
+    } else {
+      d$Grouping <- ifelse(d$Grouping == "Humanity", 
+                           "A person who is\nnot a citizen of\nyour own country\n", 
+                           "Someone from\nyour neighborhood\n")
+    }
   }
   # make plots
   if (type == "line") {
@@ -110,7 +123,7 @@ makePlotList <- function(d, plotPars, type) {
   return(out)
 }
 
-makeGrid <- function(plotList, indexes, file, height = 7, width = 9) {
+makeGrid <- function(plotList, indexes, file, height = 7, width = 9.5) {
   l <- get_legend(plotList[[indexes[1]]])
   if (grepl("grouping", file)) {
     out <- plot_grid(plotList[[indexes[1]]] + theme(legend.position = "none"),
@@ -123,7 +136,7 @@ makeGrid <- function(plotList, indexes, file, height = 7, width = 9) {
                      plotList[[indexes[4]]] + theme(legend.position = "none"),
                      nrow = 2, labels = letters[1:4])
   }
-  out <- plot_grid(out, l, rel_widths = c(1, 0.2))
+  out <- plot_grid(out, l, rel_widths = c(1, 0.25))
   ggsave(file, 
          plot = out, 
          height = ifelse(grepl("grouping", file), height / 2, height), 
