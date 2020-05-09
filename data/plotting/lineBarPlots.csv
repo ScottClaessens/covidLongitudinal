@@ -55,4 +55,5 @@ PFIEmpathy,Grouping,PFI Empathy,"When _______ succeeds, I feel good","Mean +/- S
 PFISharedFate,Grouping,PFI Shared Fate,"_______ and I rise and fall together","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)",Grouping,1,7,grouping,pfiSharedFate
 Willingness,Grouping,Willingness to help,"_______ is having their house fixed,\nso it isn't livable. How willing would you\nbe to let them move into your house for a week?","Mean +/- SE\n(1 = not at all willing, 7 = very willing)",Grouping,1,7,grouping,willingness
 NBT,Grouping,NBT,"\nHelping _______ when\nthey are in need is the right thing to do","Mean +/- SE\n(1 = strongly disagree, 7 = strongly agree)",Grouping,1,7,grouping,nbt
-PerceptionRisk,Age,"Perceived COVID Risk","How likely do think it is that\nyou will contract/become infected with COVID19?","Mean +/- SE\n(1 = Not at all, 7 = Extremely)",Age,1,7,age,perceivedRisk
+PerceptionRisk,Age,"Perceived COVID Risk","How likely do you think it is that\nyou will contract/become infected with COVID19?","Mean +/- SE\n(1 = Not at all, 7 = Extremely)",Age,1,7,age,perceivedRisk
+PFIHumanityEmpathy,Age,"PFI Empathy (Humanity)","When all of humanity succeeds, I feel good","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)",Age,1,7,age,pfiEmpathyHumanity

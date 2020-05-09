@@ -256,7 +256,7 @@ worldMapCounts <- function(data) {
                alpha = 0.85, data = data) +
     guides(colour = FALSE, fill = guide_legend(title = "Region",
                                                override.aes = list(alpha = 0.85))) +
-    scale_size_area(breaks = seq(25,125,25)) +
+    scale_size_area(breaks = c(5, seq(25,125,25))) +
     theme_classic() +
     theme(axis.title.x = element_blank(),
           axis.title.y = element_blank())
