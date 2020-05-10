@@ -1,21 +1,90 @@
+# functions
+loadData <- function(file) {
+  out <- read_sav(file)
+  # get country_codes based on self-report
+  # if no self-report, take IP address country
+  out$country_code <-
+    ifelse(out$CurrentCountrySelfReport == "Wales",             "GB",
+    ifelse(out$CurrentCountrySelfReport == "US",                "US",
+    ifelse(out$CurrentCountrySelfReport == "UK",                "GB",
+    ifelse(out$CurrentCountrySelfReport == "Turkey",            "TR",
+    ifelse(out$CurrentCountrySelfReport == "Switzerland",       "CH",
+    ifelse(out$CurrentCountrySelfReport == "Sweden",            "SE",
+    ifelse(out$CurrentCountrySelfReport == "Spain",             "ES",
+    ifelse(out$CurrentCountrySelfReport == "Slovenia",          "SI",
+    ifelse(out$CurrentCountrySelfReport == "Scotland",          "GB",
+    ifelse(out$CurrentCountrySelfReport == "Republic",          "IE",
+    ifelse(out$CurrentCountrySelfReport == "Portugal",          "PT",
+    ifelse(out$CurrentCountrySelfReport == "Poland",            "PL",
+    ifelse(out$CurrentCountrySelfReport == "pl",                "PL",
+    ifelse(out$CurrentCountrySelfReport == "NS",                "CA",
+    ifelse(out$CurrentCountrySelfReport == "Norway",            "NO",
+    ifelse(out$CurrentCountrySelfReport == "Northern",          "GB",
+    ifelse(out$CurrentCountrySelfReport == "New Zealand",       "NZ",
+    ifelse(out$CurrentCountrySelfReport == "Netherlands",       "NL",
+    ifelse(out$CurrentCountrySelfReport == "Mexico",            "MX",
+    ifelse(out$CurrentCountrySelfReport == "Luxembourg",        "LU",
+    ifelse(out$CurrentCountrySelfReport == "Latvia",            "LV",
+    ifelse(out$CurrentCountrySelfReport == "Italy",             "IT",
+    ifelse(out$CurrentCountrySelfReport == "Israel",            "IL",
+    ifelse(out$CurrentCountrySelfReport == "Ireland",           "IE",
+    ifelse(out$CurrentCountrySelfReport == "Hungary",           "HU",
+    ifelse(out$CurrentCountrySelfReport == "Greece",            "GR",
+    ifelse(out$CurrentCountrySelfReport == "Germany",           "DE",
+    ifelse(out$CurrentCountrySelfReport == "France",            "FR",
+    ifelse(out$CurrentCountrySelfReport == "Finland",           "FI",
+    ifelse(out$CurrentCountrySelfReport == "Estonia",           "EE",
+    ifelse(out$CurrentCountrySelfReport == "England",           "GB",
+    ifelse(out$CurrentCountrySelfReport == "Ecuador",           "EC",
+    ifelse(out$CurrentCountrySelfReport == "Denmark",           "DK",
+    ifelse(out$CurrentCountrySelfReport == "Czech Republic",    "CZ",
+    ifelse(out$CurrentCountrySelfReport == "Chile",             "CL",
+    ifelse(out$CurrentCountrySelfReport == "carms",             "US",
+    ifelse(out$CurrentCountrySelfReport == "Canada",            "CA",
+    ifelse(out$CurrentCountrySelfReport == "Belgium",           "BE",
+    ifelse(out$CurrentCountrySelfReport == "Austria",           "AT",
+    ifelse(out$CurrentCountrySelfReport == "Australia",         "AU", 
+           NA))))))))))))))))))))))))))))))))))))))))
+  # modify a few country_codes
+  if (grepl("Long", file)) {
+    out$country_code[1:4] <- "PL"
+    out$country_code[1985:1988] <- "GB"
+  } else {
+    out$country_code[265] <- "PL"
+    out$country_code[458] <- "AU"
+    out$country_code[497] <- "GB"
+  }
+  # get regions
+  out$region <-
+    ifelse(out$country_code %in% c("US", "CA"), "United States / Canada",
+           ifelse(out$country_code %in% c("GB", "IE"), "United Kingdom / Ireland",
+                  ifelse(out$country_code %in% c("PT", "PL", "ES", "GR", "FR", "IT",
+                                                 "BE", "CZ", "DE", "NL", "NO", "EE",
+                                                 "SI", "FI", "LV", "LU", "SE", "CH",
+                                                 "AT", "DK", "HU"), "Europe (excl. UK / Ireland)",
+                         "Other")))
+  out$region <- factor(out$region, levels = c("United States / Canada",
+                                              "United Kingdom / Ireland",
+                                              "Europe (excl. UK / Ireland)",
+                                              "Other"))
+  return(out)
+}
+
+
 makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, foldername, filename, type) {
   # prepare SSES
   d$SSES <- ifelse(d$SSES >= 1 & d$SSES < 4, "Low SES",
                    ifelse(d$SSES >= 4 & d$SSES < 7, "Medium SES",
                           ifelse(d$SSES >= 7 & d$SSES <= 9, "High SES", NA)))
   d$SSES <- factor(d$SSES, levels = c("High SES", "Medium SES", "Low SES"))
-  # prepare IPregion
-  d$IPregion <- ifelse(d$IPregion == "UK", "United Kingdom / Ireland",
-                       ifelse(d$IPregion == "Europe", "Europe (excl. UK / Ireland)",
-                              ifelse(d$IPregion == "North America", "United States / Canada", 
-                                     d$IPregion)))
-  d$IPregion <- factor(d$IPregion, levels = unique(d$IPregion)[c(3,2,1,4)])
   # prepare children
   d$ChildrenDichot <- factor(ifelse(d$ChildrenDichot==0, "None", "At least one"))
   # prepare sex
   d$Sex <- factor(ifelse(d$Sex==1, "Male", "Female"))
   # prepare age
   d$Age <- factor(ifelse(d$Age < 30, "18-30", "30+"))
+  # prepare medical
+  d$Preexisting <- factor(ifelse(d$Preexisting == 1, "Yes", "No"), levels = c("Yes", "No"))
   # if humanity vs. neighborhood plots
   if (group == "Grouping") {
     d <-
@@ -41,6 +110,7 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
       d$Grouping <- ifelse(d$Grouping == "Humanity", 
                            "A person who is\nnot a citizen of\nyour own country\n", 
                            "Someone from\nyour neighborhood\n")
+      d$Grouping <- factor(d$Grouping, levels = unique(d$Grouping)[c(2,1)])
     }
   }
   # make plots
@@ -120,7 +190,7 @@ makePlotList <- function(d, plotPars, type) {
 
 makeGrid <- function(plotList, indexes, file, height = 7, width = 9.5) {
   l <- get_legend(plotList[[indexes[1]]])
-  if (grepl("grouping", file)) {
+  if (grepl("grouping", file) | grepl("medical", file)) {
     out <- plot_grid(plotList[[indexes[1]]] + theme(legend.position = "none"),
                      plotList[[indexes[2]]] + theme(legend.position = "none"),
                      nrow = 1, labels = letters[1:2])
@@ -134,11 +204,13 @@ makeGrid <- function(plotList, indexes, file, height = 7, width = 9.5) {
   out <- plot_grid(out, l, rel_widths = c(1, 0.25))
   ggsave(paste0(file, ".pdf"), 
          plot = out, 
-         height = ifelse(grepl("grouping", file), height / 2, height), 
+         height = ifelse(grepl("grouping", file) | grepl("medical", file), 
+                         height / 2, height), 
          width = width)
   ggsave(paste0(file, ".png"), 
          plot = out, 
-         height = ifelse(grepl("grouping", file), height / 2, height), 
+         height = ifelse(grepl("grouping", file) | grepl("medical", file), 
+                         height / 2, height), 
          width = width)
   return(out)
 }
@@ -149,15 +221,21 @@ makeGridList <- function(plotList, type) {
   gridTypes <- c("risk", "pfi", "help")
   files <- paste0("figures/", type, "Plots/", rep(groups, each=3), "/grids/", 
                   type, "_", rep(groups, each=3), "_", rep(gridTypes, times=4), "Grid")
-  files <- c(files, 
+  files <- c(files,
+             # grouping
              paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_pfiGrid"),
-             paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_helpGrid"))
+             paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_helpGrid"),
+             # medical
+             paste0("figures/", type, "Plots/medical/grids/", type, "_medical_pfiGrid")
+             )
   # indexes
   i <- list(c(10:13), c( 1:4 ), c( 5:8 ), # region
             c(23:26), c(14:17), c(18:21), # sex
             c(36:39), c(27:30), c(31:34), # children
             c(49:52), c(40:43), c(44:47), # ses
-            c(53:54), c(55:56))           # grouping
+            c(53:54), c(55:56),           # grouping
+            c(59:60)                      # medical
+  )
   # list
   out <- list()
   for (j in 1:length(files)) {
@@ -196,15 +274,10 @@ makeCorPlot <- function(data, timepoint) {
 }
 
 countTableRegion <- function(data) {
-  data$IPregion <- ifelse(data$IPregion == "UK", "United Kingdom / Ireland",
-                          ifelse(data$IPregion == "Europe", "Europe (excl. UK / Ireland)",
-                                 ifelse(data$IPregion == "North America", "United States / Canada",
-                                        data$IPregion)))
-  data$IPregion <- factor(data$IPregion, levels = unique(data$IPregion)[c(3,2,1,4)])
   out <- 
     data %>%
     filter(Time == 1) %>%
-    group_by(IPregion) %>%
+    group_by(region, country_code) %>%
     summarise(count = n())
   return(out)
 }
@@ -230,13 +303,6 @@ worldMapCounts <- function(data) {
     theme(panel.background = element_rect(fill = 'white'))
   data <-
     data %>%
-    mutate(country_code = maxmind(IPAddress, file, "country_code")$country_code,
-           continent_name = maxmind(IPAddress, file, "continent_name")$continent_name,
-           region = factor(ifelse(country_code %in% c("CA", "US"), "United States / Canada",
-                                  ifelse(country_code %in% c("GB", "IE"), "United Kingdom / Ireland",
-                                         ifelse(continent_name == "Europe", "Europe (excl. UK)",
-                                                "Other")))),
-           region = factor(region, levels = levels(region)[c(4,3,1,2)])) %>%
     filter(Time == 1) %>%
     group_by(region, country_code) %>%
     summarise(Count = n()) %>%

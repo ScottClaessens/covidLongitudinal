@@ -1,8 +1,8 @@
 # drake plan
 plan <- drake_plan(
   # load data
-  dLong = read_sav("data/Corona - cohort 1 - Times 1-4 - Long - Excluding missing region.sav"),
-  dWide = read_sav("data/Corona - cohort 1 - Times 1-4 - Wide - Excluding missing region.sav"),
+  dLong = loadData("data/Corona - cohort 1 - Times 1-4 - Long - Excluding missing region.sav"),
+  dWide = loadData("data/Corona - cohort 1 - Times 1-4 - Wide - Excluding missing region.sav"),
   # line plots
   linePlotList = makePlotList(
     dLong, read.csv("data/plotting/lineBarPlots.csv",
