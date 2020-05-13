@@ -290,17 +290,26 @@ worldMapCounts <- function(data) {
     ne_countries(scale = "medium", returnclass = "sf") %>%
     filter(continent %in% unique(continent)[1:6]) %>%
     mutate(region = ifelse(iso_a2 %in% c("US", "CA"), "United States / Canada",
-                           ifelse(iso_a2 %in% c("GB", "IE"), "United Kingdom / Ireland",
-                                  ifelse(continent == "Europe", 
-                                         "Europe (excl. UK / Ireland)", "Other"))),
+                    ifelse(iso_a2 %in% c("GB", "IE"), "United Kingdom / Ireland",
+                    ifelse(iso_a2 %in% c("PT", "PL", "ES", "GR", "FR", "IT",
+                                         "BE", "CZ", "DE", "NL", "NO", "EE",
+                                         "SI", "FI", "LV", "LU", "SE", "CH",
+                                         "AT", "DK", "HU"), "Europe (excl. UK / Ireland)", 
+                    ifelse(iso_a2 %in% c("TR", "NZ", "MX", "IL", "EC", "CL", "AU"), "Other",
+                                         "Not measured")))),
            region = factor(region, levels = c("United States / Canada", "United Kingdom / Ireland",
-                                                     "Europe (excl. UK / Ireland)", "Other"))) %>%
+                                                     "Europe (excl. UK / Ireland)", "Other", "Not measured"))) %>%
     drop_na(region)
   world <- 
     ggplot() +
     geom_sf(data = world, aes(fill = region, colour = region), colour = NA, alpha = 0.2) + 
     coord_sf(ylim = c(-50, 90), xlim = c(), datum = NA) +
-    theme(panel.background = element_rect(fill = 'white'))
+    theme(panel.background = element_rect(fill = 'white')) +
+    scale_fill_manual(breaks = c("United States / Canada",
+                                 "United Kingdom / Ireland",
+                                 "Europe (excl. UK / Ireland)",
+                                 "Other"),
+                      values = c("#F8766D", "#7CAE00", "#00BFC4", "#C77CFF", "grey80")) 
   data <-
     data %>%
     filter(Time == 1) %>%
