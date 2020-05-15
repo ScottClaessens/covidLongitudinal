@@ -82,7 +82,7 @@ makePlot <- function(d, y, group, subtitle, ylab, ymin, ymax, legendTitle, folde
   # prepare sex
   d$Sex <- factor(ifelse(d$Sex==1, "Male", "Female"))
   # prepare age
-  d$Age <- factor(ifelse(d$Age < 30, "18-30", "30+"))
+  d$Age <- factor(ifelse(d$Age < 30, "18-29", "30+"))
   # prepare medical
   d$Preexisting <- factor(ifelse(d$Preexisting == 1, "Yes", "No"), levels = c("Yes", "No"))
   # if humanity vs. neighborhood plots
