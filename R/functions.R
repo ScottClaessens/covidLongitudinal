@@ -190,7 +190,7 @@ makePlotList <- function(d, plotPars, type) {
 
 makeGrid <- function(plotList, indexes, file, height = 7, width = 9.5) {
   l <- get_legend(plotList[[indexes[1]]])
-  if (grepl("grouping", file) | grepl("medical", file)) {
+  if (grepl("grouping", file) | grepl("medical", file) | grepl("age", file)) {
     out <- plot_grid(plotList[[indexes[1]]] + theme(legend.position = "none"),
                      plotList[[indexes[2]]] + theme(legend.position = "none"),
                      nrow = 1, labels = letters[1:2])
@@ -204,12 +204,12 @@ makeGrid <- function(plotList, indexes, file, height = 7, width = 9.5) {
   out <- plot_grid(out, l, rel_widths = c(1, 0.25))
   ggsave(paste0(file, ".pdf"), 
          plot = out, 
-         height = ifelse(grepl("grouping", file) | grepl("medical", file), 
+         height = ifelse(grepl("grouping", file) | grepl("medical", file) | grepl("age", file), 
                          height / 2, height), 
          width = width)
   ggsave(paste0(file, ".png"), 
          plot = out, 
-         height = ifelse(grepl("grouping", file) | grepl("medical", file), 
+         height = ifelse(grepl("grouping", file) | grepl("medical", file) | grepl("age", file), 
                          height / 2, height), 
          width = width)
   return(out)
@@ -226,7 +226,9 @@ makeGridList <- function(plotList, type) {
              paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_pfiGrid"),
              paste0("figures/", type, "Plots/grouping/grids/", type, "_grouping_helpGrid"),
              # medical
-             paste0("figures/", type, "Plots/medical/grids/", type, "_medical_pfiGrid")
+             paste0("figures/", type, "Plots/medical/grids/", type, "_medical_pfiGrid"),
+             # age
+             paste0("figures/", type, "Plots/age/grids/", type, "_age_pfiGrid")
              )
   # indexes
   i <- list(c(10:13), c( 1:4 ), c( 5:8 ), # region
@@ -234,7 +236,8 @@ makeGridList <- function(plotList, type) {
             c(36:39), c(27:30), c(31:34), # children
             c(49:52), c(40:43), c(44:47), # ses
             c(53:54), c(55:56),           # grouping
-            c(59:60)                      # medical
+            c(59:60),                     # medical
+            c(61,58)                      # age
   )
   # list
   out <- list()

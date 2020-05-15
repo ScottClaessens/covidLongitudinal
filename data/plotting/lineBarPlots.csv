@@ -59,4 +59,5 @@ PerceptionRisk,Age,"Perceived COVID Risk","How likely do you think it is that\ny
 PFIHumanityEmpathy,Age,"PFI Empathy (Humanity)","When all of humanity succeeds, I feel good","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)",Age,1,7,age,pfiEmpathyHumanity
 PFIHumanityEmpathy,Preexisting,"PFI Empathy (Humanity)","When all of humanity succeeds, I feel good","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)","Pre-existing\nmedical",1,7,medical,pfiEmpathyHumanity
 PFIHumanitySharedFate,Preexisting,"PFI Shared Fate (Humanity)","All of humanity and I rise and fall together","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)","Pre-existing\nmedical",1,7,medical,pfiSharedFateHumanity
+PFINeighEmpathy,Age,"PFI Empathy (Neighbour)","When my neighborhood succeeds, I feel good","Mean +/- SE\n(1 = do not agree at all, 7 = strongly agree)",Age,1,7,age,pfiEmpathyNeighbour
 
